@@ -208,25 +208,7 @@ namespace Cake.Common.Tools.NuGet.Sources
 
             AddCommonParameters(name, source, settings, builder);
 
-            // User name specified?
-            if (!string.IsNullOrWhiteSpace(settings.UserName))
-            {
-                builder.Append("-UserName");
-                builder.AppendQuoted(settings.UserName);
-            }
-
-            // Password specified?
-            if (!string.IsNullOrWhiteSpace(settings.Password))
-            {
-                builder.Append("-Password");
-                builder.AppendQuotedSecret(settings.Password);
-            }
-
-            // Store password in plain text?
-            if (settings.StorePasswordInClearText)
-            {
-                builder.Append("-StorePasswordInClearText");
-            }
+            AddAddOrUpdateParameters(settings, builder);
 
             return builder;
         }
@@ -239,25 +221,7 @@ namespace Cake.Common.Tools.NuGet.Sources
 
             AddCommonParameters(name, source, settings, builder);
 
-            // User name specified?
-            if (!string.IsNullOrWhiteSpace(settings.UserName))
-            {
-                builder.Append("-UserName");
-                builder.AppendQuoted(settings.UserName);
-            }
-
-            // Password specified?
-            if (!string.IsNullOrWhiteSpace(settings.Password))
-            {
-                builder.Append("-Password");
-                builder.AppendQuotedSecret(settings.Password);
-            }
-
-            // Store password in plain text?
-            if (settings.StorePasswordInClearText)
-            {
-                builder.Append("-StorePasswordInClearText");
-            }
+            AddAddOrUpdateParameters(settings, builder);
 
             return builder;
         }
@@ -303,6 +267,29 @@ namespace Cake.Common.Tools.NuGet.Sources
             }
 
             builder.Append("-NonInteractive");
+        }
+
+        private static void AddAddOrUpdateParameters(NuGetSourcesSettings settings, ProcessArgumentBuilder builder)
+        {
+            // User name specified?
+            if (!string.IsNullOrWhiteSpace(settings.UserName))
+            {
+                builder.Append("-UserName");
+                builder.AppendQuoted(settings.UserName);
+            }
+
+            // Password specified?
+            if (!string.IsNullOrWhiteSpace(settings.Password))
+            {
+                builder.Append("-Password");
+                builder.AppendQuotedSecret(settings.Password);
+            }
+
+            // Store password in plain text?
+            if (settings.StorePasswordInClearText)
+            {
+                builder.Append("-StorePasswordInClearText");
+            }
         }
     }
 }
