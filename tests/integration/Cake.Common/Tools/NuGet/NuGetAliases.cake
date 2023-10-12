@@ -52,6 +52,26 @@ Task("Cake.Common.Tools.NuGet.NuGetAliases.NuGetHasSource")
     Assert.True(result);
 });
 
+Task("Cake.Common.Tools.NuGet.NuGetAliases.NuGetUpdateSource")
+    .IsDependentOn("Cake.Common.Tools.NuGet.NuGetAliases.NuGetAddSource")
+    .Does(() =>
+{
+    // Given
+    var name = "TestSource";
+    var source = "https://contoso.com/packages/";
+    var settings = new NuGetSourcesSettings {
+            ConfigFile = NuGetAliasesConfigFile
+        };
+
+    // When
+    NuGetUpdateSource(
+        name,
+        source,
+        settings
+        );
+});
+
+
 Task("Cake.Common.Tools.NuGet.NuGetAliases.NuGetHasSource.ArgumentCustomization")
     .IsDependentOn("Cake.Common.Tools.NuGet.NuGetAliases.NuGetAddSource")
     .Does(() =>

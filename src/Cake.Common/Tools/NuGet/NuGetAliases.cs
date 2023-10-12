@@ -434,6 +434,79 @@ namespace Cake.Common.Tools.NuGet
         }
 
         /// <summary>
+        /// Updates NuGet package source using the specified name &amp;source to global user config.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="name">Name of the source.</param>
+        /// <param name="source">Path to the package(s) source.</param>
+        /// <example>
+        /// <code>
+        /// var feed = new
+        ///             {
+        ///                 Name = EnvironmentVariable("PUBLIC_FEED_NAME"),
+        ///                 Source = EnvironmentVariable("PUBLIC_FEED_SOURCE")
+        ///             };
+        ///
+        /// NuGetUpdateSource(
+        ///     name:feed.Name,
+        ///     source:feed.Source
+        /// );
+        /// </code>
+        /// </example>
+        [CakeMethodAlias]
+        [CakeAliasCategory("UpdateSource")]
+        [CakeNamespaceImport("Cake.Common.Tools.NuGet.Sources")]
+        public static void NuGetUpdateSource(this ICakeContext context, string name, string source)
+        {
+            context.NuGetUpdateSource(name, source, new NuGetSourcesSettings());
+        }
+
+        /// <summary>
+        /// Updates NuGet package source using the specified name, source &amp; settings to global user config.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="name">Name of the source.</param>
+        /// <param name="source">Path to the package(s) source.</param>
+        /// <param name="settings">The settings.</param>
+        /// <example>
+        /// <code>
+        /// var nugetSourceSettings = new NuGetSourcesSettings
+        ///                             {
+        ///                                 UserName = EnvironmentVariable("PRIVATE_FEED_USERNAME"),
+        ///                                 Password = EnvironmentVariable("PRIVATE_FEED_PASSWORD"),
+        ///                                 IsSensitiveSource = true,
+        ///                                 Verbosity = NuGetVerbosity.Detailed
+        ///                             };
+        ///
+        /// var feed = new
+        ///             {
+        ///                 Name = EnvironmentVariable("PRIVATE_FEED_NAME"),
+        ///                 Source = EnvironmentVariable("PRIVATE_FEED_SOURCE")
+        ///             };
+        ///
+        /// NuGetUpdateSource(
+        ///     name:feed.Name,
+        ///     source:feed.Source,
+        ///     settings:nugetSourceSettings
+        /// );
+        /// </code>
+        /// </example>
+        [CakeMethodAlias]
+        [CakeAliasCategory("UpdateSource")]
+        [CakeNamespaceImport("Cake.Common.Tools.NuGet.Sources")]
+        public static void NuGetUpdateSource(this ICakeContext context, string name, string source, NuGetSourcesSettings settings)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var resolver = new NuGetToolResolver(context.FileSystem, context.Environment, context.Tools);
+            var runner = new NuGetSources(context.FileSystem, context.Environment, context.ProcessRunner, context.Tools, resolver);
+            runner.UpdateSource(name, source, settings);
+        }
+
+        /// <summary>
         /// Removes NuGet package source using the specified name &amp; source from global user config.
         /// </summary>
         /// <param name="context">The context.</param>

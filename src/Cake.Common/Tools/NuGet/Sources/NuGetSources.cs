@@ -73,6 +73,44 @@ namespace Cake.Common.Tools.NuGet.Sources
         }
 
         /// <summary>
+        /// Updates NuGet package source using the specified settings to global user config.
+        /// </summary>
+        /// <param name="name">Name of the source.</param>
+        /// <param name="source">Path to the package(s) source.</param>
+        /// <param name="settings">The settings.</param>
+        public void UpdateSource(string name, string source, NuGetSourcesSettings settings)
+        {
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Source name cannot be empty.", nameof(name));
+            }
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (string.IsNullOrWhiteSpace(source))
+            {
+                throw new ArgumentException("Source cannot be empty.", nameof(source));
+            }
+            if (settings == null)
+            {
+                throw new ArgumentNullException(nameof(settings));
+            }
+
+            if (!HasSource(source, settings))
+            {
+                var message = string.Format(CultureInfo.InvariantCulture, "The source '{0}' does not exist.", source);
+                throw new InvalidOperationException(message);
+            }
+
+            Run(settings, GetUpdateArguments(name, source, settings));
+        }
+
+        /// <summary>
         /// Remove specified NuGet package source.
         /// </summary>
         /// <param name="name">Name of the source.</param>
@@ -170,25 +208,20 @@ namespace Cake.Common.Tools.NuGet.Sources
 
             AddCommonParameters(name, source, settings, builder);
 
-            // User name specified?
-            if (!string.IsNullOrWhiteSpace(settings.UserName))
-            {
-                builder.Append("-UserName");
-                builder.AppendQuoted(settings.UserName);
-            }
+            AddAddOrUpdateParameters(settings, builder);
 
-            // Password specified?
-            if (!string.IsNullOrWhiteSpace(settings.Password))
-            {
-                builder.Append("-Password");
-                builder.AppendQuotedSecret(settings.Password);
-            }
+            return builder;
+        }
 
-            // Store password in plain text?
-            if (settings.StorePasswordInClearText)
-            {
-                builder.Append("-StorePasswordInClearText");
-            }
+        private static ProcessArgumentBuilder GetUpdateArguments(string name, string source, NuGetSourcesSettings settings)
+        {
+            var builder = new ProcessArgumentBuilder();
+
+            builder.Append("sources Update");
+
+            AddCommonParameters(name, source, settings, builder);
+
+            AddAddOrUpdateParameters(settings, builder);
 
             return builder;
         }
@@ -234,6 +267,29 @@ namespace Cake.Common.Tools.NuGet.Sources
             }
 
             builder.Append("-NonInteractive");
+        }
+
+        private static void AddAddOrUpdateParameters(NuGetSourcesSettings settings, ProcessArgumentBuilder builder)
+        {
+            // User name specified?
+            if (!string.IsNullOrWhiteSpace(settings.UserName))
+            {
+                builder.Append("-UserName");
+                builder.AppendQuoted(settings.UserName);
+            }
+
+            // Password specified?
+            if (!string.IsNullOrWhiteSpace(settings.Password))
+            {
+                builder.Append("-Password");
+                builder.AppendQuotedSecret(settings.Password);
+            }
+
+            // Store password in plain text?
+            if (settings.StorePasswordInClearText)
+            {
+                builder.Append("-StorePasswordInClearText");
+            }
         }
     }
 }
